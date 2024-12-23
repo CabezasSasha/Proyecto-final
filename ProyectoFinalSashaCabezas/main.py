@@ -242,28 +242,33 @@ def eliminar_producto():
 
     print(f"\nProducto con ID {id_producto} eliminado del inventario.\n")
 
-# Función para generar un reporte de bajo stock
 def reporte_bajo_stock():
     limite = input("Ingrese el límite de stock para el reporte: ").strip()
 
     if not limite.isdigit():
-        print("\nLímite no válido.\n")
+        print("\nLímite no válido. Debe ser un número entero.\n")
         return
 
-    conexion = sqlite3.connect("inventario.db")
-    cursor = conexion.cursor()
-    cursor.execute("SELECT * FROM productos WHERE cantidad <= ?", (int(limite),))
-    productos = cursor.fetchall()
-    conexion.close()
+    try:
+        conexion = sqlite3.connect("inventario.db")
+        cursor = conexion.cursor()
 
-    if not productos:
-        print(f"\nNo hay productos con stock igual o inferior a {limite}.\n")
-        return
+        print("\nConsultando productos...")
+        cursor.execute("SELECT * FROM productos WHERE cantidad <= ?", (int(limite),))
+        productos = cursor.fetchall()
 
-    print(f"\nProductos con stock igual o inferior a {limite}:")
-    for producto in productos:
-        print(f"ID: {producto[0]} | Nombre: {producto[1]} | Stock: {producto[3]}")
-    print()
+        conexion.close()
+
+        if not productos:
+            print(f"\nNo hay productos con stock igual o inferior a {limite}.\n")
+            return
+
+        print(f"\nProductos con stock igual o inferior a {limite}:")
+        for producto in productos:
+            print(f"ID: {producto[0]} | Nombre: {producto[1]} | Stock: {producto[3]}")
+        print()
+    except sqlite3.Error as e:
+        print(f"\nError al acceder a la base de datos: {e}\n")
 
 # Menú principal
 def menu_principal():
